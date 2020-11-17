@@ -5,7 +5,7 @@
  * (programming by Chris 'Xenon' Hanson, AlphaPixel, LLC xenon at alphapixel.com)
  * based on a fork of:
  * Osg AL - OpenSceneGraph Audio Library
- * Copyright (C) 2004 VRlab, Umeå University
+ * Copyright (C) 2004 VRlab, Umeï¿½ University
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -113,8 +113,9 @@ osg::Node* createBase(const osg::Vec3& center,float radius)
     
     
     int numIndicesPerRow=numTilesX+1;
-    osg::UByteArray* coordIndices = new osg::UByteArray; // assumes we are using less than 256 points...
-    osg::UByteArray* colorIndices = new osg::UByteArray;
+    // [piptouque] same as in osgaudio, we use::ref_ptr, to use them in osg::Geometry.
+    osg::ref_ptr<osg::UByteArray> coordIndices = new osg::UByteArray; // assumes we are using less than 256 points...
+    osg::ref_ptr<osg::UByteArray> colorIndices = new osg::UByteArray;
     for(iy=0;iy<numTilesY;++iy)
     {
         for(int ix=0;ix<numTilesX;++ix)
@@ -135,30 +136,20 @@ osg::Node* createBase(const osg::Vec3& center,float radius)
     osg::Vec3Array* normals = new osg::Vec3Array;
     normals->push_back(osg::Vec3(0.0f,0.0f,1.0f));
     
-#if OSG_VERSION_GREATER_THAN(3,2,0)
-    deprecated_osg::Geometry* geom = new deprecated_osg::Geometry;
-#else
     osg::Geometry* geom = new osg::Geometry;
-#endif
     geom->setVertexArray(coords);
-    geom->setVertexIndices(coordIndices);
-    
-    geom->setColorArray(colors);
-    geom->setColorIndices(colorIndices);
+    // [piptouque] see osgaudio.cpp for comments about updating
+    // to the new osg::Geometry.
+    geom->getVertexArray()->setUserData(coordIndices);
 
-#if OSG_VERSION_GREATER_THAN(3,2,0)
-    geom->setColorBinding(deprecated_osg::Geometry::BIND_PER_PRIMITIVE);
-#else
-    geom->setColorBinding(osg::Geometry::BIND_PER_PRIMITIVE);
-#endif
+    geom->setColorArray(colors);
+    geom->getColorArray()->setUserData(colorIndices);
+
+    geom->getColorArray()->setBinding((osg::Array::Binding)3);
 
     geom->setNormalArray(normals);
 
-#if OSG_VERSION_GREATER_THAN(3,2,0)
-    geom->setNormalBinding(deprecated_osg::Geometry::BIND_OVERALL);
-#else
-    geom->setNormalBinding(osg::Geometry::BIND_OVERALL);
-#endif
+    geom->getNormalArray()->setBinding(osg::Array::Binding::BIND_OVERALL);
 
     geom->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::QUADS,0,coordIndices->size()));
     
