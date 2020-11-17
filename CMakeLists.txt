@@ -27,8 +27,8 @@ SET(SUBSYSTEM_TARGET_LINKS )
 
 
 # determine audio subsystem support
-OPTION(0_ENABLE_SUBSYSTEM_OPENAL "Set to ON to build support for OpenAL/OpenAL++ audio subsystem." OFF)
-OPTION(0_ENABLE_SUBSYSTEM_FMOD "Set to ON to build support for FMOD Ex audio subsystem." ON)
+OPTION(0_ENABLE_SUBSYSTEM_OPENAL "Set to ON to build support for OpenAL/OpenAL++ audio subsystem." ON)
+OPTION(0_ENABLE_SUBSYSTEM_FMOD "Set to ON to build support for FMOD Ex audio subsystem." OFF)
 
 SET(ENABLE_SUBSYSTEM_FMOD FALSE)
 SET(ENABLE_SUBSYSTEM_OPENAL FALSE)
